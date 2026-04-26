@@ -1,0 +1,20 @@
+services:
+  bot:
+    build: ./bot
+    env_file: .env
+    environment:
+      SEARXNG_BASE_URL: http://searxng:8080
+    volumes:
+      - bot_data:/app/data
+    depends_on:
+      - searxng
+    restart: unless-stopped
+
+  searxng:
+    image: searxng/searxng:latest
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+    restart: unless-stopped
+
+volumes:
+  bot_data:

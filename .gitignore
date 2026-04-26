@@ -1,0 +1,5 @@
+.env
+bot/.venv/
+bot/__pycache__/
+bot/*.egg-info/
+bot/data/

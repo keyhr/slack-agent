@@ -1,0 +1,29 @@
+use_default_settings: true
+
+server:
+  # 本番運用では必ず変更すること
+  secret_key: "changeme-please-set-a-random-string"
+  limiter: false
+
+search:
+  formats:
+    - html
+    - json
+
+engines:
+  # サーバーIPからブロックされやすいエンジンを無効化
+  - name: duckduckgo
+    disabled: true
+  - name: startpage
+    disabled: true
+  - name: qwant
+    disabled: true
+  - name: brave
+    disabled: true
+  - name: google
+    disabled: true
+  # 安定動作するエンジンを明示的に有効化
+  - name: bing
+    disabled: false
+  - name: mojeek
+    disabled: false

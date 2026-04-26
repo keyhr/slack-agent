@@ -1,0 +1,45 @@
+{
+    "display_information": {
+        "name": "Agent"
+    },
+    "features": {
+        "bot_user": {
+            "display_name": "Agent",
+            "always_online": false
+        },
+        "slash_commands": [
+            {
+                "command": "/register",
+                "description": "このチャンネルで使用するLLMモデルを設定する（管理者のみ）",
+                "usage_hint": "[モデル名]",
+                "should_escape": false
+            }
+        ]
+    },
+    "oauth_config": {
+        "scopes": {
+            "bot": [
+                "app_mentions:read",
+                "channels:history",
+                "chat:write",
+                "commands",
+                "files:read"
+            ],
+            "user": [
+                "search:read"
+            ]
+        },
+        "pkce_enabled": false
+    },
+    "settings": {
+        "event_subscriptions": {
+            "bot_events": [
+                "app_mention"
+            ]
+        },
+        "org_deploy_enabled": false,
+        "socket_mode_enabled": true,
+        "token_rotation_enabled": false,
+        "is_mcp_enabled": false
+    }
+}
