@@ -1,4 +1,9 @@
-use_default_settings: true
+use_default_settings:
+  engines:
+    remove:
+      - wikidata
+      - ahmia
+      - torch
 
 server:
   # 本番運用では必ず変更すること

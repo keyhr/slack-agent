@@ -14,7 +14,7 @@ services:
   searxng:
     image: searxng/searxng:latest
     volumes:
-      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - ./searxng/settings.yml:/etc/searxng/settings.yml
     restart: unless-stopped
 
 volumes:
