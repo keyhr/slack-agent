@@ -178,18 +178,21 @@ def _execute_tool(name: str, args: dict) -> str:
     return "不明なツールです"
 
 
-def _create_with_retry(model: str, messages: list, max_retries: int = 3):
+def _create_with_retry(model: str, messages: list, max_retries: int = 3, tools: list | None = None):
+    last_exc: Exception = RuntimeError("unreachable")
     for attempt in range(max_retries):
         try:
             return openrouter_client.chat.completions.create(
                 model=model,
                 messages=messages,
-                tools=get_tools_definition(),  # type: ignore[arg-type]
+                tools=tools if tools is not None else get_tools_definition(),  # type: ignore[arg-type]
             )
-        except RateLimitError:
+        except RateLimitError as e:
+            last_exc = e
             if attempt == max_retries - 1:
                 raise
             time.sleep(2**attempt)  # 1s, 2s
+    raise last_exc
 
 
 def _run_tool_calls_parallel(tool_calls, slack_client, channel, thread_ts) -> dict[str, str]:

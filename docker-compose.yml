@@ -4,6 +4,7 @@ services:
     env_file: .env
     environment:
       SEARXNG_BASE_URL: http://searxng:8080
+      TZ: Asia/Tokyo
     volumes:
       - bot_data:/app/data
     depends_on:

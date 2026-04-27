@@ -12,6 +12,8 @@ dependencies = [
     "python-docx",
     "pandas",
     "python-dotenv",
+    "apscheduler>=3.10",
+    "pytz",
 ]
 
 [build-system]
@@ -19,4 +21,4 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["bot", "agent", "tools", "config", "store"]
+py-modules = ["bot", "agent", "tools", "config", "store", "news_digest"]

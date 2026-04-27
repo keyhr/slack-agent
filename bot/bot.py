@@ -6,12 +6,14 @@ load_dotenv()
 
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from agent import run_agent
 from config import ADMIN_USER_IDS, ALLOWED_MODEL_PATTERNS, DEFAULT_MODEL, is_model_allowed
-from store import get_model, init_db, set_model
+from news_digest import run_news_digest
+from store import get_config, get_model, init_db, set_config, set_model
 
 app = App(token=os.getenv("SLACK_BOT_TOKEN"))
 
@@ -78,6 +80,63 @@ def handle_register(ack, command, client):
     )
 
 
+@app.command("/subscribe-news")
+def handle_subscribe_news(ack, command, client):
+    ack()
+    user_id = command["user_id"]
+    channel = command["channel_id"]
+
+    if user_id not in ADMIN_USER_IDS:
+        client.chat_postEphemeral(
+            channel=channel,
+            user=user_id,
+            text="⛔ このコマンドは管理者のみ使用できます。",
+        )
+        return
+
+    set_config("news_channel", channel)
+    client.chat_postMessage(
+        channel=channel,
+        text=f"✅ このチャンネルをデイリーニュース配信先に設定しました。（<@{user_id}>）",
+    )
+
+
+@app.command("/news-test")
+def handle_news_test(ack, command, client):
+    ack()
+    user_id = command["user_id"]
+    channel = command["channel_id"]
+
+    if user_id not in ADMIN_USER_IDS:
+        client.chat_postEphemeral(
+            channel=channel,
+            user=user_id,
+            text="⛔ このコマンドは管理者のみ使用できます。",
+        )
+        return
+
+    client.chat_postEphemeral(
+        channel=channel,
+        user=user_id,
+        text="⏳ ニュースダイジェストのテスト実行を開始しました...",
+    )
+    threading.Thread(target=run_news_digest, args=(app.client,), daemon=True).start()
+
+
 if __name__ == "__main__":
+    news_hour = int(os.getenv("NEWS_CRON_HOUR", "6"))
+    news_minute = int(os.getenv("NEWS_CRON_MINUTE", "0"))
+    news_tz = os.getenv("NEWS_CRON_TZ", "Asia/Tokyo")
+
+    scheduler = BackgroundScheduler(timezone=news_tz)
+    scheduler.add_job(
+        lambda: run_news_digest(app.client),
+        trigger="cron",
+        hour=news_hour,
+        minute=news_minute,
+    )
+    scheduler.start()
+    print(f"[scheduler] News digest scheduled at {news_hour:02d}:{news_minute:02d} {news_tz}", flush=True)
+
     handler = SocketModeHandler(app, os.getenv("SLACK_APP_TOKEN"))
     handler.start()

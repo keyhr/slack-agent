@@ -5,25 +5,10 @@ server:
   secret_key: "changeme-please-set-a-random-string"
   limiter: false
 
+outgoing:
+  request_timeout: 20.0
+
 search:
   formats:
     - html
     - json
-
-engines:
-  # サーバーIPからブロックされやすいエンジンを無効化
-  - name: duckduckgo
-    disabled: true
-  - name: startpage
-    disabled: true
-  - name: qwant
-    disabled: true
-  - name: brave
-    disabled: true
-  - name: google
-    disabled: true
-  # 安定動作するエンジンを明示的に有効化
-  - name: bing
-    disabled: false
-  - name: mojeek
-    disabled: false

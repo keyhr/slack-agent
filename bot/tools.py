@@ -34,7 +34,7 @@ def _searxng_search(query: str, num_results: int) -> str:
     resp = requests.get(
         f"{SEARXNG_BASE_URL}/search",
         params={"q": query, "format": "json"},
-        timeout=10,
+        timeout=30,
     )
     resp.raise_for_status()
     data = resp.json()

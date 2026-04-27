@@ -13,6 +13,16 @@
                 "description": "このチャンネルで使用するLLMモデルを設定する（管理者のみ）",
                 "usage_hint": "[モデル名]",
                 "should_escape": false
+            },
+            {
+                "command": "/subscribe-news",
+                "description": "このチャンネルをデイリーニュース配信先に設定する（管理者のみ）",
+                "should_escape": false
+            },
+            {
+                "command": "/news-test",
+                "description": "ニュースダイジェストをすぐにテスト実行する（管理者のみ）",
+                "should_escape": false
             }
         ]
     },

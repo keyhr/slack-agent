@@ -14,6 +14,13 @@ def init_db() -> None:
                 updated_at TEXT DEFAULT (datetime('now'))
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS bot_config (
+                key        TEXT PRIMARY KEY,
+                value      TEXT NOT NULL,
+                updated_at TEXT DEFAULT (datetime('now'))
+            )
+        """)
 
 
 def get_model(channel_id: str) -> str | None:
@@ -37,6 +44,28 @@ def set_model(channel_id: str, model: str, updated_by: str) -> None:
                 updated_at = datetime('now')
             """,
             (channel_id, model, updated_by),
+        )
+
+
+def get_config(key: str) -> str | None:
+    with sqlite3.connect(DB_PATH) as conn:
+        row = conn.execute(
+            "SELECT value FROM bot_config WHERE key = ?", (key,)
+        ).fetchone()
+    return row[0] if row else None
+
+
+def set_config(key: str, value: str) -> None:
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute(
+            """
+            INSERT INTO bot_config (key, value)
+            VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET
+                value      = excluded.value,
+                updated_at = datetime('now')
+            """,
+            (key, value),
         )
 
 

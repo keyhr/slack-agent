@@ -7,7 +7,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
-COPY bot.py agent.py tools.py config.py store.py ./
+COPY bot.py agent.py tools.py config.py store.py news_digest.py ./
 
 RUN mkdir -p /app/data
 
