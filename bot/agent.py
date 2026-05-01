@@ -6,12 +6,12 @@ from concurrent.futures import ThreadPoolExecutor
 
 from openai import OpenAI, RateLimitError
 
-from config import MAX_AGENT_LOOPS
+from config import LLM_API_KEY, LLM_BASE_URL, MAX_AGENT_LOOPS
 from tools import build_system_prompt, fetch_url, get_tools_definition, read_file, slack_search, web_search
 
 openrouter_client = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY", ""),
-    base_url="https://openrouter.ai/api/v1",
+    api_key=LLM_API_KEY,
+    base_url=LLM_BASE_URL,
 )
 
 
