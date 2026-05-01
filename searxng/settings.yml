@@ -6,8 +6,8 @@ use_default_settings:
       - torch
 
 server:
-  # 本番運用では必ず変更すること
-  secret_key: "changeme-please-set-a-random-string"
+  # SEARXNG_SECRET 環境変数で上書きされる（docker-entrypoint.sh が ultrasecretkey を置換）
+  secret_key: "ultrasecretkey"
   limiter: false
 
 outgoing:
