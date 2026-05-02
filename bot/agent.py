@@ -228,6 +228,7 @@ def run_agent(
     channel: str,
     thread_ts: str,
     file_info: dict | None = None,
+    history: list | None = None,
 ) -> None:
     if file_info:
         user_message += (
@@ -237,6 +238,7 @@ def run_agent(
 
     messages: list = [
         {"role": "system", "content": build_system_prompt()},
+        *(history or []),
         {"role": "user", "content": user_message},
     ]
     thinking_msg = slack_client.chat_postMessage(

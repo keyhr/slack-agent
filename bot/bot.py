@@ -19,12 +19,36 @@ app = App(token=os.getenv("SLACK_BOT_TOKEN"))
 
 init_db()
 
+THREAD_HISTORY_LIMIT = 20
+
+
+def _fetch_thread_history(client, channel: str, thread_ts: str, current_ts: str) -> list[dict]:
+    result = client.conversations_replies(channel=channel, ts=thread_ts, limit=THREAD_HISTORY_LIMIT + 1)
+    messages = [m for m in result.get("messages", []) if m["ts"] != current_ts]
+    messages = messages[-THREAD_HISTORY_LIMIT:]
+
+    history = []
+    for m in messages:
+        content = m.get("text", "")
+        if files := m.get("files"):
+            f = files[0]
+            content += f"\n\n[添付ファイル]\nURL: {f['url_private']}\nファイル名: {f['name']}"
+
+        if m.get("bot_id"):
+            blocks = m.get("blocks", [])
+            if blocks and blocks[0].get("type") == "divider":
+                history.append({"role": "assistant", "content": content})
+        elif content.strip():
+            history.append({"role": "user", "content": content})
+    return history
+
 
 @app.event("app_mention")
 def handle_mention(event, client):
     channel = event["channel"]
     thread_ts = event.get("thread_ts") or event["ts"]
     text = event["text"]
+    ts = event["ts"]
 
     model = get_model(channel) or DEFAULT_MODEL
 
@@ -33,9 +57,13 @@ def handle_mention(event, client):
         f = files[0]
         file_info = {"url": f["url_private"], "filename": f["name"]}
 
+    history: list[dict] = []
+    if event.get("thread_ts"):
+        history = _fetch_thread_history(client, channel, thread_ts, current_ts=ts)
+
     threading.Thread(
         target=run_agent,
-        args=(text, model, client, channel, thread_ts, file_info),
+        args=(text, model, client, channel, thread_ts, file_info, history),
         daemon=True,
     ).start()
 
